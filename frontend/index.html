@@ -1,11 +1,16 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lista de Filmes | Tarefa Marcio</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -15,20 +20,26 @@
         }
 
         header {
-            background: rgba(255,255,255,0.05);
+            background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(10px);
             padding: 20px 40px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         header h1 {
             font-size: 1.8rem;
             background: linear-gradient(90deg, #a78bfa, #60a5fa);
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
+        }
+
+        .header-btns {
+            display: flex;
+            gap: 12px;
         }
 
         header a {
@@ -41,9 +52,15 @@
             transition: opacity 0.2s;
         }
 
-        header a:hover { opacity: 0.85; }
+        header a:hover {
+            opacity: 0.85;
+        }
 
-        main { padding: 40px; max-width: 1100px; margin: 0 auto; }
+        main {
+            padding: 40px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
 
         h2 {
             font-size: 1.4rem;
@@ -65,35 +82,237 @@
         }
 
         .card {
-            background: rgba(255,255,255,0.07);
-            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 16px;
             padding: 24px;
             transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
         }
 
         .card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 12px 30px rgba(167,139,250,0.2);
+            box-shadow: 0 12px 30px rgba(167, 139, 250, 0.2);
         }
 
         .card h3 {
             font-size: 1.2rem;
             color: #e2e8f0;
-            margin-bottom: 10px;
+            margin-bottom: 4px;
         }
 
-        .card p { color: #94a3b8; font-size: 0.9rem; margin-bottom: 6px; }
+        .card p {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
 
-        .card .badge {
+        .card .sinopse {
+            color: #cbd5e1;
+            margin-top: 6px;
+            font-size: 0.88rem;
+        }
+
+        .badge {
             display: inline-block;
-            background: rgba(167,139,250,0.2);
+            background: rgba(167, 139, 250, 0.2);
             color: #a78bfa;
-            border: 1px solid rgba(167,139,250,0.4);
+            border: 1px solid rgba(167, 139, 250, 0.4);
             border-radius: 20px;
             padding: 2px 12px;
             font-size: 0.78rem;
-            margin-top: 8px;
+            margin-top: 6px;
+            width: fit-content;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 14px;
+        }
+
+        .btn-editar,
+        .btn-deletar {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.1s;
+        }
+
+        .btn-editar {
+            background: rgba(96, 165, 250, 0.2);
+            color: #60a5fa;
+            border: 1px solid rgba(96, 165, 250, 0.35);
+        }
+
+        .btn-deletar {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-editar:hover {
+            background: rgba(96, 165, 250, 0.35);
+        }
+
+        .btn-deletar:hover {
+            background: rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-editar:active,
+        .btn-deletar:active {
+            transform: scale(0.97);
+        }
+
+        /* ── MODAL ── */
+        .overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(4px);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .overlay.ativo {
+            display: flex;
+        }
+
+        .modal {
+            background: #1e1b4b;
+            border: 1px solid rgba(167, 139, 250, 0.3);
+            border-radius: 20px;
+            padding: 36px;
+            width: 100%;
+            max-width: 480px;
+            position: relative;
+            animation: fadeIn 0.2s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-16px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal h2 {
+            color: #c4b5fd;
+            margin-bottom: 24px;
+            font-size: 1.3rem;
+        }
+
+        .fechar-modal {
+            position: absolute;
+            top: 16px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-size: 1.5rem;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .fechar-modal:hover {
+            color: #fff;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            color: #94a3b8;
+            font-size: 0.88rem;
+            font-weight: 500;
+        }
+
+        input,
+        textarea,
+        select {
+            width: 100%;
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            border-color: #a78bfa;
+        }
+
+        select option {
+            background: #302b63;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .btn-salvar {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(90deg, #a78bfa, #60a5fa);
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 6px;
+            transition: opacity 0.2s;
+        }
+
+        .btn-salvar:hover {
+            opacity: 0.88;
+        }
+
+        .btn-salvar:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+
+        #msg-modal {
+            margin-top: 12px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            text-align: center;
+            display: none;
+        }
+
+        #msg-modal.sucesso {
+            background: rgba(52, 211, 153, 0.15);
+            border: 1px solid rgba(52, 211, 153, 0.4);
+            color: #6ee7b7;
+        }
+
+        #msg-modal.erro {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            color: #fca5a5;
         }
 
         .sem-filmes {
@@ -102,68 +321,207 @@
             color: #64748b;
         }
 
-        .sem-filmes p { font-size: 1.1rem; margin-top: 12px; }
+        .sem-filmes p {
+            font-size: 1.1rem;
+            margin-top: 12px;
+        }
     </style>
 </head>
+
 <body>
 
-<header>
-    <h1>🎬 Catálogo de Filmes</h1>
-    <a href="cadastro.html">+ Cadastrar Filme</a>
-</header>
+    <header>
+        <h1>🎬 Catálogo de Filmes</h1>
+        <div class="header-btns">
+            <a href="cadastro.html">+ Cadastrar Filme</a>
+        </div>
+    </header>
 
-<main>
-    <h2>Filmes Cadastrados</h2>
-    <div id="status">Carregando filmes...</div>
-    <div class="grid" id="grid-filmes"></div>
-</main>
+    <main>
+        <h2>Filmes Cadastrados</h2>
+        <div id="status">Carregando filmes...</div>
+        <div class="grid" id="grid-filmes"></div>
+    </main>
 
-<script>
-    const API_URL = 'http://localhost:3000/api/filmes';
+    <!-- ── MODAL DE EDIÇÃO ── -->
+    <div class="overlay" id="overlay">
+        <div class="modal">
+            <button class="fechar-modal" id="fechar-modal" title="Fechar">✕</button>
+            <h2>✏️ Editar Filme</h2>
+            <form id="form-edicao">
+                <input type="hidden" id="edit-id">
+                <div class="form-group">
+                    <label for="edit-titulo">Título *</label>
+                    <input type="text" id="edit-titulo" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-diretor">Diretor *</label>
+                    <input type="text" id="edit-diretor" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-ano">Ano *</label>
+                    <input type="number" id="edit-ano" min="1888" max="2030" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-genero">Gênero</label>
+                    <select id="edit-genero">
+                        <option value="">-- Selecione (opcional) --</option>
+                        <option value="Ação">Ação</option>
+                        <option value="Aventura">Aventura</option>
+                        <option value="Comédia">Comédia</option>
+                        <option value="Drama">Drama</option>
+                        <option value="Ficção Científica">Ficção Científica</option>
+                        <option value="Horror">Horror</option>
+                        <option value="Romance">Romance</option>
+                        <option value="Thriller">Thriller</option>
+                        <option value="Animação">Animação</option>
+                        <option value="Documentário">Documentário</option>
+                        <option value="Outro">Outro</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="edit-sinopse">Sinopse</label>
+                    <textarea id="edit-sinopse"></textarea>
+                </div>
+                <button type="submit" class="btn-salvar" id="btn-salvar">Salvar Alterações</button>
+            </form>
+            <div id="msg-modal"></div>
+        </div>
+    </div>
 
-    async function carregarFilmes() {
-        const status = document.getElementById('status');
-        const grid = document.getElementById('grid-filmes');
+    <script>
+        const API_URL = 'http://localhost:3000/api/filmes';
 
-        try {
-            const resposta = await fetch(API_URL);
+        // ── Escapar HTML ──
+        function esc(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
 
-            if (!resposta.ok) throw new Error('Erro na resposta do servidor');
+        // ── Carregar filmes ──
+        async function carregarFilmes() {
+            const status = document.getElementById('status');
+            const grid = document.getElementById('grid-filmes');
 
-            const filmes = await resposta.json();
-            status.textContent = '';
+            try {
+                const resp = await fetch(API_URL);
+                if (!resp.ok) throw new Error('Erro na resposta do servidor');
+                const filmes = await resp.json();
+                status.textContent = '';
 
-            if (filmes.length === 0) {
-                status.innerHTML = '<div class="sem-filmes"><span style="font-size:3rem">🎞️</span><p>Nenhum filme cadastrado ainda.<br>Clique em "Cadastrar Filme" para adicionar!</p></div>';
-                return;
-            }
+                if (filmes.length === 0) {
+                    status.innerHTML = '<div class="sem-filmes"><span style="font-size:3rem">🎞️</span><p>Nenhum filme cadastrado ainda.<br>Clique em "+ Cadastrar Filme" para adicionar!</p></div>';
+                    return;
+                }
 
-            grid.innerHTML = filmes.map(filme => `
+                grid.innerHTML = filmes.map(f => `
                 <div class="card">
-                    <h3>${escapar(filme.titulo)}</h3>
-                    <p>🎬 <strong>Diretor:</strong> ${escapar(filme.diretor)}</p>
-                    <p>📅 <strong>Ano:</strong> ${filme.ano}</p>
-                    ${filme.sinopse ? `<p style="margin-top:10px;color:#cbd5e1;">${escapar(filme.sinopse)}</p>` : ''}
-                    ${filme.genero ? `<span class="badge">${escapar(filme.genero)}</span>` : ''}
+                    <h3>${esc(f.titulo)}</h3>
+                    <p>🎬 <strong>Diretor:</strong> ${esc(f.diretor)}</p>
+                    <p>📅 <strong>Ano:</strong> ${f.ano}</p>
+                    ${f.sinopse ? `<p class="sinopse">${esc(f.sinopse)}</p>` : ''}
+                    ${f.genero ? `<span class="badge">${esc(f.genero)}</span>` : ''}
+                    <div class="card-actions">
+                        <button class="btn-editar" onclick='abrirEdicao(${JSON.stringify(f)})'>✏️ Editar</button>
+                        <button class="btn-deletar" onclick="deletarFilme(${f.id}, '${esc(f.titulo)}')">🗑️ Deletar</button>
+                    </div>
                 </div>
             `).join('');
 
-        } catch (erro) {
-            status.innerHTML = '<p style="color:#ef4444;">❌ Não foi possível carregar os filmes. Verifique se o servidor está rodando.</p>';
-            console.error(erro);
+            } catch (e) {
+                status.innerHTML = '<p style="color:#ef4444;">❌ Não foi possível carregar os filmes. Verifique se o servidor está rodando.</p>';
+            }
         }
-    }
 
-    function escapar(str) {
-        if (!str) return '';
-        return String(str)
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;');
-    }
+        // ── Deletar filme ──
+        async function deletarFilme(id, titulo) {
+            if (!confirm(`Tem certeza que deseja deletar "${titulo}"?`)) return;
 
-    carregarFilmes();
-</script>
+            try {
+                const resp = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+                const dado = await resp.json();
+                if (resp.ok) {
+                    carregarFilmes();
+                } else {
+                    alert('❌ ' + dado.erro);
+                }
+            } catch (e) {
+                alert('❌ Erro ao deletar. Verifique a conexão.');
+            }
+        }
+
+        // ── Abrir modal de edição ──
+        function abrirEdicao(filme) {
+            document.getElementById('edit-id').value = filme.id;
+            document.getElementById('edit-titulo').value = filme.titulo;
+            document.getElementById('edit-diretor').value = filme.diretor;
+            document.getElementById('edit-ano').value = filme.ano;
+            document.getElementById('edit-genero').value = filme.genero || '';
+            document.getElementById('edit-sinopse').value = filme.sinopse || '';
+            document.getElementById('msg-modal').style.display = 'none';
+            document.getElementById('overlay').classList.add('ativo');
+        }
+
+        // ── Fechar modal ──
+        function fecharModal() {
+            document.getElementById('overlay').classList.remove('ativo');
+        }
+
+        document.getElementById('fechar-modal').addEventListener('click', fecharModal);
+        document.getElementById('overlay').addEventListener('click', function (e) {
+            if (e.target === this) fecharModal();
+        });
+
+        // ── Salvar edição ──
+        document.getElementById('form-edicao').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const id = document.getElementById('edit-id').value;
+            const btn = document.getElementById('btn-salvar');
+            const msg = document.getElementById('msg-modal');
+
+            const dados = {
+                titulo: document.getElementById('edit-titulo').value.trim(),
+                diretor: document.getElementById('edit-diretor').value.trim(),
+                ano: parseInt(document.getElementById('edit-ano').value),
+                genero: document.getElementById('edit-genero').value,
+                sinopse: document.getElementById('edit-sinopse').value.trim(),
+            };
+
+            btn.disabled = true;
+            btn.textContent = 'Salvando...';
+            msg.style.display = 'none';
+
+            try {
+                const resp = await fetch(`${API_URL}/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(dados)
+                });
+                const dado = await resp.json();
+
+                if (resp.ok) {
+                    msg.className = 'sucesso';
+                    msg.textContent = '✅ ' + dado.mensagem;
+                    msg.style.display = 'block';
+                    carregarFilmes();
+                    setTimeout(fecharModal, 1200);
+                } else {
+                    throw new Error(dado.erro || 'Erro desconhecido');
+                }
+            } catch (err) {
+                msg.className = 'erro';
+                msg.textContent = '❌ ' + err.message;
+                msg.style.display = 'block';
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Salvar Alterações';
+            }
+        });
+
+        carregarFilmes();
+    </script>
 </body>
+
 </html>

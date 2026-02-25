@@ -51,6 +51,49 @@ app.post('/api/filmes', async (req, res) => {
 });
 
 // ─────────────────────────────────────────────
+// ROTA PUT - Editar um filme existente
+// ─────────────────────────────────────────────
+app.put('/api/filmes/:id', async (req, res) => {
+    const { id } = req.params;
+    const { titulo, diretor, ano, genero, sinopse } = req.body;
+
+    if (!titulo || !diretor || !ano) {
+        return res.status(400).json({ erro: 'Título, Diretor e Ano são obrigatórios.' });
+    }
+
+    try {
+        const [result] = await db.query(
+            'UPDATE filmes_kao04 SET titulo=?, diretor=?, ano=?, genero=?, sinopse=? WHERE id=?',
+            [titulo, diretor, ano, genero || null, sinopse || null, id]
+        );
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ erro: 'Filme não encontrado.' });
+        }
+        res.json({ mensagem: 'Filme atualizado com sucesso!' });
+    } catch (error) {
+        console.error('Erro ao editar filme:', error);
+        res.status(500).json({ erro: 'Erro ao editar filme no banco de dados.' });
+    }
+});
+
+// ─────────────────────────────────────────────
+// ROTA DELETE - Deletar um filme
+// ─────────────────────────────────────────────
+app.delete('/api/filmes/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const [result] = await db.query('DELETE FROM filmes_kao04 WHERE id=?', [id]);
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ erro: 'Filme não encontrado.' });
+        }
+        res.json({ mensagem: 'Filme deletado com sucesso!' });
+    } catch (error) {
+        console.error('Erro ao deletar filme:', error);
+        res.status(500).json({ erro: 'Erro ao deletar filme no banco de dados.' });
+    }
+});
+
+// ─────────────────────────────────────────────
 // Rota raiz → redireciona para o frontend
 // ─────────────────────────────────────────────
 app.get('/', (req, res) => {
