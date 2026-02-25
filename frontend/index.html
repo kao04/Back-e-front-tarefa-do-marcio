@@ -443,7 +443,7 @@
                 const resp = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
                 const dado = await resp.json();
                 if (resp.ok) {
-                    carregarFilmes();
+                    location.reload();
                 } else {
                     alert('❌ ' + dado.erro);
                 }
