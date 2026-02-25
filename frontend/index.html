@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Filmes | Tarefa Marcio</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            min-height: 100vh;
+            color: #fff;
+        }
+
+        header {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+            background: linear-gradient(90deg, #a78bfa, #60a5fa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        header a {
+            background: linear-gradient(90deg, #a78bfa, #60a5fa);
+            color: #fff;
+            text-decoration: none;
+            padding: 10px 24px;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: opacity 0.2s;
+        }
+
+        header a:hover { opacity: 0.85; }
+
+        main { padding: 40px; max-width: 1100px; margin: 0 auto; }
+
+        h2 {
+            font-size: 1.4rem;
+            margin-bottom: 24px;
+            color: #c4b5fd;
+        }
+
+        #status {
+            text-align: center;
+            padding: 20px;
+            color: #a78bfa;
+            font-size: 1.1rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 16px;
+            padding: 24px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(167,139,250,0.2);
+        }
+
+        .card h3 {
+            font-size: 1.2rem;
+            color: #e2e8f0;
+            margin-bottom: 10px;
+        }
+
+        .card p { color: #94a3b8; font-size: 0.9rem; margin-bottom: 6px; }
+
+        .card .badge {
+            display: inline-block;
+            background: rgba(167,139,250,0.2);
+            color: #a78bfa;
+            border: 1px solid rgba(167,139,250,0.4);
+            border-radius: 20px;
+            padding: 2px 12px;
+            font-size: 0.78rem;
+            margin-top: 8px;
+        }
+
+        .sem-filmes {
+            text-align: center;
+            padding: 60px;
+            color: #64748b;
+        }
+
+        .sem-filmes p { font-size: 1.1rem; margin-top: 12px; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>🎬 Catálogo de Filmes</h1>
+    <a href="cadastro.html">+ Cadastrar Filme</a>
+</header>
+
+<main>
+    <h2>Filmes Cadastrados</h2>
+    <div id="status">Carregando filmes...</div>
+    <div class="grid" id="grid-filmes"></div>
+</main>
+
+<script>
+    const API_URL = 'http://localhost:3000/api/filmes';
+
+    async function carregarFilmes() {
+        const status = document.getElementById('status');
+        const grid = document.getElementById('grid-filmes');
+
+        try {
+            const resposta = await fetch(API_URL);
+
+            if (!resposta.ok) throw new Error('Erro na resposta do servidor');
+
+            const filmes = await resposta.json();
+            status.textContent = '';
+
+            if (filmes.length === 0) {
+                status.innerHTML = '<div class="sem-filmes"><span style="font-size:3rem">🎞️</span><p>Nenhum filme cadastrado ainda.<br>Clique em "Cadastrar Filme" para adicionar!</p></div>';
+                return;
+            }
+
+            grid.innerHTML = filmes.map(filme => `
+                <div class="card">
+                    <h3>${escapar(filme.titulo)}</h3>
+                    <p>🎬 <strong>Diretor:</strong> ${escapar(filme.diretor)}</p>
+                    <p>📅 <strong>Ano:</strong> ${filme.ano}</p>
+                    ${filme.sinopse ? `<p style="margin-top:10px;color:#cbd5e1;">${escapar(filme.sinopse)}</p>` : ''}
+                    ${filme.genero ? `<span class="badge">${escapar(filme.genero)}</span>` : ''}
+                </div>
+            `).join('');
+
+        } catch (erro) {
+            status.innerHTML = '<p style="color:#ef4444;">❌ Não foi possível carregar os filmes. Verifique se o servidor está rodando.</p>';
+            console.error(erro);
+        }
+    }
+
+    function escapar(str) {
+        if (!str) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    carregarFilmes();
+</script>
+</body>
+</html>
